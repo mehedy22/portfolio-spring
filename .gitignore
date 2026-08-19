@@ -14,3 +14,6 @@ out/
 
 ### Logs ###
 *.log
+
+### Local media storage (LOCAL backend) ###
+data/

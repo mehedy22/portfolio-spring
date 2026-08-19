@@ -19,6 +19,14 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
+  servlet:
+    multipart:
+      # Outer guard only. The per-type limits under app.media are the ones that produce the
+      # documented 400 VALIDATION_ERROR; this stops a multi-gigabyte body from being buffered
+      # at all, and is deliberately set above the largest per-type limit.
+      max-file-size: ${UPLOAD_MAX_FILE_SIZE:12MB}
+      max-request-size: ${UPLOAD_MAX_REQUEST_SIZE:14MB}
+
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -49,6 +57,14 @@ app:
       # Provisions the single admin on first start when no admin row exists. No defaults by design.
       email: ${ADMIN_EMAIL:}
       password: ${ADMIN_PASSWORD:}
+
+  media:
+    # NFR-06 / D-018. Externalized: widening the limit is an env-var change, not a release.
+    max-image-size: ${MEDIA_MAX_IMAGE_SIZE:5MB}
+    max-document-size: ${MEDIA_MAX_DOCUMENT_SIZE:10MB}
+    # LOCAL storage backend root. Production swaps in an object-storage backend instead
+    # (OPEN_QUESTIONS.md #11) — no caller changes when it does.
+    storage-root: ${MEDIA_STORAGE_ROOT:./data/media}
 
 springdoc:
   api-docs:
