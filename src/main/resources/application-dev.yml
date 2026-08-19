@@ -1,0 +1,23 @@
+# Local development profile — activate with --spring.profiles.active=dev
+#
+# Supplies a throwaway JWT secret so `bootRun` works without exporting anything. This value is
+# public by definition (it is committed), which is exactly why the main application.yml has no
+# default: production must set JWT_SECRET and will refuse to start without it.
+spring:
+  # A host-installed PostgreSQL 16 cluster owns 5432 on the current development machine, so the
+  # project's docker-compose Postgres is published on 5433 (see ../docker-compose.yml and the
+  # DB_PORT entry in the repo-root .env). Only the *fallback* changes here — the placeholders are
+  # kept intact, so a machine with a free 5432 can still point at it with DB_PORT=5432, and
+  # DB_HOST/DB_NAME keep working as before.
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:portfolio}
+
+app:
+  jwt:
+    secret: OrmZGK+OU6UTpyb3+NgB1eMLKYwKcdl+SEEp5fxAIx0ZGwdZO72v00OQmbKctxyt
+
+  # Convenience admin for local work only. Production bootstraps via ADMIN_EMAIL/ADMIN_PASSWORD.
+  auth:
+    bootstrap:
+      email: admin@localhost
+      password: dev-only-password
