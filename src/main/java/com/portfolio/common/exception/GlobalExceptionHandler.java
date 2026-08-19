@@ -5,12 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
@@ -39,6 +41,25 @@ public class GlobalExceptionHandler {
 		ErrorResponse body = ErrorResponse.of(
 				HttpStatus.BAD_REQUEST.value(), "VALIDATION_ERROR", "Invalid request", path(request), violations);
 		return ResponseEntity.badRequest().body(body);
+	}
+
+	/**
+	 * An unparseable body — malformed JSON, or a value outside an enum's allowed set
+	 * ({@code "status": "WIZARD"}). Jackson raises this before any handler runs, so without this
+	 * the client would see a 500 for input the API itself rejected.
+	 */
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ErrorResponse> handleUnreadableBody(
+			HttpMessageNotReadableException ex, WebRequest request) {
+		log.warn("Rejected unreadable request body: {}", ex.getMostSpecificCause().getMessage());
+		return badRequest("Request body is malformed or contains a value outside its allowed set", request);
+	}
+
+	/** The query-parameter equivalent: {@code ?status=NOPE} binding to an enum. */
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<ErrorResponse> handleTypeMismatch(
+			MethodArgumentTypeMismatchException ex, WebRequest request) {
+		return badRequest("Parameter '%s' has an invalid value".formatted(ex.getName()), request);
 	}
 
 	/**

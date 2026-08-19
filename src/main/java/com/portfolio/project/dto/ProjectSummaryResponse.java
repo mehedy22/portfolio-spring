@@ -1,7 +1,7 @@
 package com.portfolio.project.dto;
 
 import com.portfolio.media.dto.MediaResponse;
-import com.portfolio.project.entity.ProjectStatus;
+import com.portfolio.common.content.ContentStatus;
 import com.portfolio.project.entity.ProjectType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
@@ -21,5 +21,5 @@ public record ProjectSummaryResponse(
 		LocalDate startDate,
 		LocalDate endDate,
 		int displayOrder,
-		ProjectStatus status) {
+		ContentStatus status) {
 }

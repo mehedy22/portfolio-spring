@@ -9,6 +9,7 @@ import com.portfolio.media.dto.MediaResponse;
 import com.portfolio.media.entity.Media;
 import com.portfolio.media.mapper.MediaMapper;
 import com.portfolio.media.repository.MediaRepository;
+import com.portfolio.media.service.MediaReferenceResolver;
 import com.portfolio.project.dto.ProjectChallengeRequest;
 import com.portfolio.project.dto.ProjectCreateRequest;
 import com.portfolio.project.dto.ProjectResponse;
@@ -17,7 +18,7 @@ import com.portfolio.project.dto.ProjectUpdateRequest;
 import com.portfolio.project.entity.Project;
 import com.portfolio.project.entity.ProjectChallenge;
 import com.portfolio.project.entity.ProjectGalleryItem;
-import com.portfolio.project.entity.ProjectStatus;
+import com.portfolio.common.content.ContentStatus;
 import com.portfolio.project.entity.ProjectType;
 import com.portfolio.project.mapper.ProjectMapper;
 import com.portfolio.project.repository.ProjectRepository;
@@ -67,6 +68,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 	private final ProjectRepository projectRepository;
 	private final MediaRepository mediaRepository;
+	private final MediaReferenceResolver mediaReferenceResolver;
 	private final TechnologyService technologyService;
 	private final ProjectMapper projectMapper;
 	private final MediaMapper mediaMapper;
@@ -74,11 +76,13 @@ public class ProjectServiceImpl implements ProjectService {
 	public ProjectServiceImpl(
 			ProjectRepository projectRepository,
 			MediaRepository mediaRepository,
+			MediaReferenceResolver mediaReferenceResolver,
 			TechnologyService technologyService,
 			ProjectMapper projectMapper,
 			MediaMapper mediaMapper) {
 		this.projectRepository = projectRepository;
 		this.mediaRepository = mediaRepository;
+		this.mediaReferenceResolver = mediaReferenceResolver;
 		this.technologyService = technologyService;
 		this.projectMapper = projectMapper;
 		this.mediaMapper = mediaMapper;
@@ -108,7 +112,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 	@Override
 	@Transactional
-	public ProjectResponse updateStatus(Long id, ProjectStatus status) {
+	public ProjectResponse updateStatus(Long id, ContentStatus status) {
 		Project project = require(id);
 		project.setStatus(status);
 		Project saved = projectRepository.save(project);
@@ -135,7 +139,7 @@ public class ProjectServiceImpl implements ProjectService {
 	@Override
 	@Transactional(readOnly = true)
 	public PageResponse<ProjectSummaryResponse> listForAdmin(
-			ProjectStatus status, int page, int size, String sort) {
+			ContentStatus status, int page, int size, String sort) {
 
 		Pageable pageable = PageRequest.of(Math.max(page, 0), Math.clamp(size, 1, MAX_PAGE_SIZE), sortOf(sort));
 		Page<Project> found = status == null
@@ -147,7 +151,7 @@ public class ProjectServiceImpl implements ProjectService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<ProjectSummaryResponse> listPublished() {
-		return projectRepository.findByStatusOrderByDisplayOrderAscIdAsc(ProjectStatus.PUBLISHED).stream()
+		return projectRepository.findByStatusOrderByDisplayOrderAscIdAsc(ContentStatus.PUBLISHED).stream()
 				.map(projectMapper::toSummary)
 				.toList();
 	}
@@ -156,7 +160,7 @@ public class ProjectServiceImpl implements ProjectService {
 	@Transactional(readOnly = true)
 	public ProjectResponse getPublishedBySlug(String slug) {
 		Project project = projectRepository
-				.findBySlugAndStatus(slug, ProjectStatus.PUBLISHED)
+				.findBySlugAndStatus(slug, ContentStatus.PUBLISHED)
 				// Deliberately the same 404 a nonexistent slug gets: a draft's existence must not be
 				// confirmable from the public API (docs/08-security/threat-model.md).
 				.orElseThrow(() -> new ResourceNotFoundException("Project '" + slug + "' not found"));
@@ -172,7 +176,7 @@ public class ProjectServiceImpl implements ProjectService {
 		project.setSlug(resolveSlug(fields.slug(), fields.title(), project.getId()));
 		project.setShortDescription(fields.shortDescription().trim());
 		project.setDetailedDescription(fields.detailedDescription());
-		project.setThumbnail(resolveThumbnail(fields.thumbnailMediaId()));
+		project.setThumbnail(mediaReferenceResolver.resolve(fields.thumbnailMediaId(), "thumbnailMediaId"));
 		project.setGithubUrl(fields.githubUrl());
 		project.setLiveUrl(fields.liveUrl());
 		project.setProjectType(fields.projectType());
@@ -232,15 +236,6 @@ public class ProjectServiceImpl implements ProjectService {
 		return projectId == null
 				? projectRepository.existsBySlug(slug)
 				: projectRepository.existsBySlugAndIdNot(slug, projectId);
-	}
-
-	private Media resolveThumbnail(Long mediaId) {
-		if (mediaId == null) {
-			return null;
-		}
-		return mediaRepository
-				.findById(mediaId)
-				.orElseThrow(() -> new ValidationException("Thumbnail media " + mediaId + " does not exist"));
 	}
 
 	private List<ProjectChallenge> buildChallenges(Project project, List<ProjectChallengeRequest> requests) {

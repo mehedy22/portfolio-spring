@@ -5,7 +5,7 @@ import com.portfolio.project.dto.ProjectCreateRequest;
 import com.portfolio.project.dto.ProjectResponse;
 import com.portfolio.project.dto.ProjectSummaryResponse;
 import com.portfolio.project.dto.ProjectUpdateRequest;
-import com.portfolio.project.entity.ProjectStatus;
+import com.portfolio.common.content.ContentStatus;
 import java.util.List;
 
 public interface ProjectService {
@@ -16,14 +16,14 @@ public interface ProjectService {
 	/** Whole-aggregate replace. Status is untouched — only {@link #updateStatus} moves it. */
 	ProjectResponse update(Long id, ProjectUpdateRequest request);
 
-	ProjectResponse updateStatus(Long id, ProjectStatus status);
+	ProjectResponse updateStatus(Long id, ContentStatus status);
 
 	/** Soft delete. */
 	void delete(Long id);
 
 	ProjectResponse getForAdmin(Long id);
 
-	PageResponse<ProjectSummaryResponse> listForAdmin(ProjectStatus status, int page, int size, String sort);
+	PageResponse<ProjectSummaryResponse> listForAdmin(ContentStatus status, int page, int size, String sort);
 
 	/** Published projects only, in display order — no status filter is accepted here by design. */
 	List<ProjectSummaryResponse> listPublished();

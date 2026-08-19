@@ -1,7 +1,7 @@
 package com.portfolio.project.repository;
 
 import com.portfolio.project.entity.Project;
-import com.portfolio.project.entity.ProjectStatus;
+import com.portfolio.common.content.ContentStatus;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -18,13 +18,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
 	@EntityGraph(attributePaths = "technologies")
-	Optional<Project> findBySlugAndStatus(String slug, ProjectStatus status);
+	Optional<Project> findBySlugAndStatus(String slug, ContentStatus status);
 
 	@EntityGraph(attributePaths = "technologies")
-	List<Project> findByStatusOrderByDisplayOrderAscIdAsc(ProjectStatus status);
+	List<Project> findByStatusOrderByDisplayOrderAscIdAsc(ContentStatus status);
 
 	@EntityGraph(attributePaths = "technologies")
-	Page<Project> findByStatus(ProjectStatus status, Pageable pageable);
+	Page<Project> findByStatus(ContentStatus status, Pageable pageable);
 
 	@Override
 	@EntityGraph(attributePaths = "technologies")

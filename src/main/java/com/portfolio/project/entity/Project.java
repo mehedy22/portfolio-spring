@@ -1,5 +1,6 @@
 package com.portfolio.project.entity;
 
+import com.portfolio.common.content.ContentStatus;
 import com.portfolio.media.entity.Media;
 import com.portfolio.technology.entity.Technology;
 import jakarta.persistence.CascadeType;
@@ -93,7 +94,7 @@ public class Project {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false, length = 20)
-	private ProjectStatus status = ProjectStatus.DRAFT;
+	private ContentStatus status = ContentStatus.DRAFT;
 
 	@Column(name = "display_order", nullable = false)
 	private int displayOrder;
@@ -255,11 +256,11 @@ public class Project {
 		this.featured = featured;
 	}
 
-	public ProjectStatus getStatus() {
+	public ContentStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(ProjectStatus status) {
+	public void setStatus(ContentStatus status) {
 		this.status = status;
 	}
 

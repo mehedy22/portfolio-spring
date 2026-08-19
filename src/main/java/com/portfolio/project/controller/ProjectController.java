@@ -7,7 +7,7 @@ import com.portfolio.project.dto.ProjectResponse;
 import com.portfolio.project.dto.ProjectStatusRequest;
 import com.portfolio.project.dto.ProjectSummaryResponse;
 import com.portfolio.project.dto.ProjectUpdateRequest;
-import com.portfolio.project.entity.ProjectStatus;
+import com.portfolio.common.content.ContentStatus;
 import com.portfolio.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -64,7 +64,7 @@ public class ProjectController {
 	@GetMapping("/admin/projects")
 	@Operation(summary = "List projects", description = "All statuses, paginated, optional ?status= filter.")
 	public ApiResponse<PageResponse<ProjectSummaryResponse>> list(
-			@RequestParam(required = false) ProjectStatus status,
+			@RequestParam(required = false) ContentStatus status,
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "" + DEFAULT_PAGE_SIZE) int size,
 			@RequestParam(required = false) String sort) {

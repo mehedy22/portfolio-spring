@@ -1,7 +1,7 @@
 package com.portfolio.project.dto;
 
 import com.portfolio.media.dto.MediaResponse;
-import com.portfolio.project.entity.ProjectStatus;
+import com.portfolio.common.content.ContentStatus;
 import com.portfolio.project.entity.ProjectType;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -27,7 +27,7 @@ public record ProjectResponse(
 		LocalDate startDate,
 		LocalDate endDate,
 		boolean featured,
-		ProjectStatus status,
+		ContentStatus status,
 		int displayOrder,
 		String features,
 		boolean aiVisible,
