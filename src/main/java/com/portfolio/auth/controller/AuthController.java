@@ -5,6 +5,7 @@ import com.portfolio.auth.dto.LoginRequest;
 import com.portfolio.auth.dto.TokenResponse;
 import com.portfolio.auth.service.AuthService;
 import com.portfolio.common.response.ApiResponse;
+import com.portfolio.common.web.ClientIp;
 import com.portfolio.security.AuthProperties;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,7 +49,7 @@ public class AuthController {
 	public ResponseEntity<ApiResponse<TokenResponse>> login(
 			@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
 
-		AuthService.AuthTokens tokens = authService.login(request, clientIp(httpRequest));
+		AuthService.AuthTokens tokens = authService.login(request, ClientIp.of(httpRequest));
 		return tokenResponse(tokens);
 	}
 
@@ -106,15 +107,4 @@ public class AuthController {
 				.path(COOKIE_PATH);
 	}
 
-	/**
-	 * Honours {@code X-Forwarded-For} so the rate limiter sees the real client behind the reverse
-	 * proxy (docs/05-architecture/deployment-view.md) rather than the proxy's own address.
-	 */
-	private String clientIp(HttpServletRequest request) {
-		String forwarded = request.getHeader("X-Forwarded-For");
-		if (forwarded != null && !forwarded.isBlank()) {
-			return forwarded.split(",")[0].trim();
-		}
-		return request.getRemoteAddr();
-	}
 }

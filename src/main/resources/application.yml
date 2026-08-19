@@ -66,6 +66,12 @@ app:
     # (OPEN_QUESTIONS.md #11) — no caller changes when it does.
     storage-root: ${MEDIA_STORAGE_ROOT:./data/media}
 
+  contact:
+    rate-limit:
+      # docs/08-security/application-security.md's rate-limit table: 5 / IP / hour.
+      max-attempts: ${CONTACT_RATE_LIMIT_MAX_ATTEMPTS:5}
+      window: ${CONTACT_RATE_LIMIT_WINDOW:1h}
+
 springdoc:
   api-docs:
     path: /v3/api-docs
