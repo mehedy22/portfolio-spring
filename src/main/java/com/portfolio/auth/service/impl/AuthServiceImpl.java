@@ -10,7 +10,10 @@ import com.portfolio.common.exception.UnauthorizedException;
 import com.portfolio.common.ratelimit.RateLimiter;
 import com.portfolio.security.AuthProperties;
 import com.portfolio.security.JwtTokenProvider;
+import com.portfolio.notification.Notifier;
+import com.portfolio.security.PasswordResetTokenStore;
 import com.portfolio.security.RefreshTokenStore;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -28,6 +31,10 @@ public class AuthServiceImpl implements AuthService {
 	private static final String INVALID_CREDENTIALS = "Invalid email or password";
 
 	private static final String RATE_LIMIT_KEY_PREFIX = "auth:login:attempts:";
+	private static final String RESET_RATE_LIMIT_KEY_PREFIX = "auth:reset:attempts:";
+
+	/** Long enough to find the mail, short enough that a leaked link goes stale quickly. */
+	private static final Duration RESET_TOKEN_TTL = Duration.ofMinutes(30);
 
 	private final AdminRepository adminRepository;
 	private final PasswordEncoder passwordEncoder;
@@ -35,6 +42,8 @@ public class AuthServiceImpl implements AuthService {
 	private final RefreshTokenStore refreshTokenStore;
 	private final RateLimiter rateLimiter;
 	private final AuthProperties authProperties;
+	private final PasswordResetTokenStore passwordResetTokenStore;
+	private final Notifier notifier;
 
 	public AuthServiceImpl(
 			AdminRepository adminRepository,
@@ -42,13 +51,17 @@ public class AuthServiceImpl implements AuthService {
 			JwtTokenProvider tokenProvider,
 			RefreshTokenStore refreshTokenStore,
 			RateLimiter rateLimiter,
-			AuthProperties authProperties) {
+			AuthProperties authProperties,
+			PasswordResetTokenStore passwordResetTokenStore,
+			Notifier notifier) {
 		this.adminRepository = adminRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.tokenProvider = tokenProvider;
 		this.refreshTokenStore = refreshTokenStore;
 		this.rateLimiter = rateLimiter;
 		this.authProperties = authProperties;
+		this.passwordResetTokenStore = passwordResetTokenStore;
+		this.notifier = notifier;
 	}
 
 	@Override
@@ -120,6 +133,51 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	/** Issues a new pair and makes the new refresh jti the only valid one. */
+	@Override
+	@Transactional(readOnly = true)
+	public void requestPasswordReset(String email, String clientIp) {
+		// Throttled on the same terms as login: without it this endpoint is an unmetered way to
+		// probe addresses and to generate mail on someone else's behalf.
+		String rateLimitKey = RESET_RATE_LIMIT_KEY_PREFIX + clientIp;
+		if (!rateLimiter.isWithinLimit(rateLimitKey, authProperties.loginRateLimit().maxAttempts())) {
+			log.warn("Password-reset rate limit exceeded for ip={}", clientIp);
+			throw new RateLimitExceededException("Too many reset requests. Try again later.");
+		}
+		rateLimiter.recordAttempt(rateLimitKey, authProperties.loginRateLimit().window());
+
+		adminRepository
+				.findByEmail(email)
+				.ifPresentOrElse(
+						admin -> {
+							String token = passwordResetTokenStore.issue(admin.getId(), RESET_TOKEN_TTL);
+							notifier.passwordReset(admin.getEmail(), token);
+							log.info("Password reset requested for adminId={}", admin.getId());
+						},
+						// Deliberately silent: the caller gets the same answer either way, so this
+						// endpoint cannot be used to learn the admin's address.
+						() -> log.info("Password reset requested for an unknown address from ip={}", clientIp));
+	}
+
+	@Override
+	@Transactional
+	public void confirmPasswordReset(String token, String newPassword) {
+		Long adminId = passwordResetTokenStore
+				.consume(token)
+				.orElseThrow(() -> new UnauthorizedException("This reset link is invalid or has expired"));
+
+		Admin admin = adminRepository
+				.findById(adminId)
+				.orElseThrow(() -> new UnauthorizedException("This reset link is invalid or has expired"));
+
+		admin.setPasswordHash(passwordEncoder.encode(newPassword));
+		adminRepository.save(admin);
+
+		// Whoever prompted the reset may have had a live session; revoking the refresh token means
+		// changing the password actually ends it rather than only changing what logs in next time.
+		refreshTokenStore.revoke(adminId);
+		log.info("Password reset completed for adminId={}", adminId);
+	}
+
 	private AuthTokens issueTokens(Long adminId) {
 		String accessToken = tokenProvider.createAccessToken(adminId);
 		JwtTokenProvider.RefreshToken refresh = tokenProvider.createRefreshToken(adminId);

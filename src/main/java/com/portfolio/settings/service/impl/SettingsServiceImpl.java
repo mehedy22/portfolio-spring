@@ -1,6 +1,9 @@
 package com.portfolio.settings.service.impl;
 
 import com.portfolio.common.exception.ValidationException;
+import com.portfolio.media.dto.MediaResponse;
+import com.portfolio.media.mapper.MediaMapper;
+import com.portfolio.media.repository.MediaRepository;
 import com.portfolio.media.service.MediaReferenceResolver;
 import com.portfolio.settings.SettingKey;
 import com.portfolio.settings.dto.PublicSettingsResponse;
@@ -19,7 +22,9 @@ import com.portfolio.settings.repository.SiteProfileRepository;
 import com.portfolio.settings.repository.SiteSettingRepository;
 import com.portfolio.settings.repository.SocialLinkRepository;
 import com.portfolio.settings.service.SettingsService;
+import com.portfolio.media.entity.Media;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +48,8 @@ public class SettingsServiceImpl implements SettingsService {
 	private final SocialLinkRepository socialLinkRepository;
 	private final SiteProfileRepository siteProfileRepository;
 	private final MediaReferenceResolver mediaReferenceResolver;
+	private final MediaRepository mediaRepository;
+	private final MediaMapper mediaMapper;
 	private final SettingsMapper settingsMapper;
 
 	public SettingsServiceImpl(
@@ -50,11 +57,15 @@ public class SettingsServiceImpl implements SettingsService {
 			SocialLinkRepository socialLinkRepository,
 			SiteProfileRepository siteProfileRepository,
 			MediaReferenceResolver mediaReferenceResolver,
+			MediaRepository mediaRepository,
+			MediaMapper mediaMapper,
 			SettingsMapper settingsMapper) {
 		this.settingRepository = settingRepository;
 		this.socialLinkRepository = socialLinkRepository;
 		this.siteProfileRepository = siteProfileRepository;
 		this.mediaReferenceResolver = mediaReferenceResolver;
+		this.mediaRepository = mediaRepository;
+		this.mediaMapper = mediaMapper;
 		this.settingsMapper = settingsMapper;
 	}
 
@@ -77,7 +88,8 @@ public class SettingsServiceImpl implements SettingsService {
 				seo,
 				socialLinkRepository.findByVisibleTrueOrderByDisplayOrderAscIdAsc().stream()
 						.map(settingsMapper::toResponse)
-						.toList());
+						.toList(),
+				featuredMedia(stored));
 	}
 
 	@Override
@@ -166,6 +178,27 @@ public class SettingsServiceImpl implements SettingsService {
 	}
 
 	// -------------------------------------------------------------- helpers
+
+	/**
+	 * Resolved here rather than left as a list of ids: the home page needs each image's URL, alt
+	 * text and dimensions to lay its grid out, and no public endpoint exposes media metadata —
+	 * only the bytes. One call, everything the shell needs.
+	 */
+	private List<MediaResponse> featuredMedia(Map<String, String> stored) {
+		String raw = stored.getOrDefault(SettingKey.HOME_FEATURED_MEDIA_IDS.key(), "");
+		List<Long> ids = Arrays.stream(raw.split(","))
+				.map(String::trim)
+				.filter(value -> value.matches("\\d+"))
+				.map(Long::valueOf)
+				.toList();
+		if (ids.isEmpty()) {
+			return List.of();
+		}
+		// Ids the admin listed but which no longer exist simply drop out (D-019).
+		Map<Long, MediaResponse> byId = mediaRepository.findAllById(ids).stream()
+				.collect(Collectors.toMap(Media::getId, mediaMapper::toResponse));
+		return ids.stream().map(byId::get).filter(java.util.Objects::nonNull).toList();
+	}
 
 	private Map<String, String> storedValues() {
 		return settingRepository.findAll().stream()

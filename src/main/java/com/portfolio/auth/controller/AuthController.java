@@ -2,6 +2,8 @@ package com.portfolio.auth.controller;
 
 import com.portfolio.auth.dto.AdminResponse;
 import com.portfolio.auth.dto.LoginRequest;
+import com.portfolio.auth.dto.PasswordResetConfirmRequest;
+import com.portfolio.auth.dto.PasswordResetRequest;
 import com.portfolio.auth.dto.TokenResponse;
 import com.portfolio.auth.service.AuthService;
 import com.portfolio.common.response.ApiResponse;
@@ -71,6 +73,31 @@ public class AuthController {
 		return ResponseEntity.ok()
 				.header(HttpHeaders.SET_COOKIE, clearedRefreshCookie().toString())
 				.body(ApiResponse.of(null, "Logged out"));
+	}
+
+	@PostMapping("/auth/password-reset/request")
+	@Operation(
+			summary = "Request a password reset",
+			description = "Always 200, whether or not the address is known — this endpoint must not "
+					+ "reveal the admin's email.")
+	public ApiResponse<Void> requestPasswordReset(
+			@Valid @RequestBody PasswordResetRequest request, HttpServletRequest httpRequest) {
+
+		authService.requestPasswordReset(request.email(), ClientIp.of(httpRequest));
+		return ApiResponse.of(null, "If that address is registered, a reset link has been sent.");
+	}
+
+	@PostMapping("/auth/password-reset/confirm")
+	@Operation(summary = "Complete a password reset", description = "Single-use token; ends any live session.")
+	public ResponseEntity<ApiResponse<Void>> confirmPasswordReset(
+			@Valid @RequestBody PasswordResetConfirmRequest request) {
+
+		authService.confirmPasswordReset(request.token(), request.newPassword());
+		// Clear the refresh cookie too: the server has revoked it, and leaving a dead cookie in the
+		// browser only produces a confusing 401 on the next silent refresh.
+		return ResponseEntity.ok()
+				.header(HttpHeaders.SET_COOKIE, clearedRefreshCookie().toString())
+				.body(ApiResponse.of(null, "Password updated. Please sign in again."));
 	}
 
 	/**

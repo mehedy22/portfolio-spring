@@ -35,6 +35,22 @@ public interface AuthService {
 	/** The authenticated admin's own profile. */
 	AdminResponse currentAdmin(Long adminId);
 
+	/**
+	 * Starts a self-service password reset (FR-16).
+	 *
+	 * <p>Returns nothing and never signals whether the address is known: the caller is anonymous,
+	 * and the endpoint must not become a way to discover the admin's email.
+	 */
+	void requestPasswordReset(String email, String clientIp);
+
+	/**
+	 * Completes a reset with a single-use token.
+	 *
+	 * @throws com.portfolio.common.exception.UnauthorizedException when the token is unknown,
+	 *     expired, or already used
+	 */
+	void confirmPasswordReset(String token, String newPassword);
+
 	/** A freshly issued token pair — the refresh token is set as a cookie by the controller. */
 	record AuthTokens(String accessToken, long accessTokenTtlSeconds, String refreshToken) {
 	}

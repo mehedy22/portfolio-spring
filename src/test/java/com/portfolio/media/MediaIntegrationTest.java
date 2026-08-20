@@ -91,7 +91,8 @@ class MediaIntegrationTest extends IntegrationTestBase {
 	@Test
 	@DisplayName("uploading a valid image returns 201 with its metadata and a public content URL")
 	void uploadImageSucceeds() throws Exception {
-		mockMvc.perform(upload(MediaTestFiles.png(), "diagram.png", "image/png").param("altText", "  A diagram  "))
+		mockMvc.perform(uploadWithoutAltText(MediaTestFiles.png(), "diagram.png", "image/png")
+						.param("altText", "  A diagram  "))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.success").value(true))
 				.andExpect(jsonPath("$.data.mimeType").value("image/png"))
@@ -171,6 +172,27 @@ class MediaIntegrationTest extends IntegrationTestBase {
 		mockMvc.perform(upload(new byte[0], "empty.png", "image/png"))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+	}
+
+	@Test
+	@DisplayName("an image without alt text is rejected; a PDF without one is fine")
+	void imagesRequireAltText() throws Exception {
+		mockMvc.perform(uploadWithoutAltText(MediaTestFiles.png(), "undescribed.png", "image/png"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+				.andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Alt text")));
+		assertThat(storedFiles()).as("rejected before anything is written").isEmpty();
+
+		mockMvc.perform(uploadWithoutAltText(MediaTestFiles.pdf(), "resume.pdf", "application/pdf"))
+				.andExpect(status().isCreated());
+	}
+
+	@Test
+	@DisplayName("blank alt text counts as missing")
+	void blankAltTextIsRejected() throws Exception {
+		mockMvc.perform(uploadWithoutAltText(MediaTestFiles.png(), "blank.png", "image/png")
+						.param("altText", "   "))
+				.andExpect(status().isBadRequest());
 	}
 
 	// -------------------------------------------------------- authorization
@@ -268,6 +290,19 @@ class MediaIntegrationTest extends IntegrationTestBase {
 	}
 
 	private MockMultipartHttpServletRequestBuilder upload(byte[] content, String fileName, String declaredType) {
+		MockMultipartHttpServletRequestBuilder request = multipart("/api/v1/admin/media");
+		request.file(new MockMultipartFile("file", fileName, declaredType, content));
+		request.header(HttpHeaders.AUTHORIZATION, bearer());
+		// Images require alt text (Sprint 8); the tests that are not about alt text supply one.
+		if (declaredType.startsWith("image/")) {
+			request.param("altText", "Test image");
+		}
+		return request;
+	}
+
+	/** Raw builder with no alt text attached, for the cases that are about alt text itself. */
+	private MockMultipartHttpServletRequestBuilder uploadWithoutAltText(
+			byte[] content, String fileName, String declaredType) {
 		MockMultipartHttpServletRequestBuilder request = multipart("/api/v1/admin/media");
 		request.file(new MockMultipartFile("file", fileName, declaredType, content));
 		request.header(HttpHeaders.AUTHORIZATION, bearer());

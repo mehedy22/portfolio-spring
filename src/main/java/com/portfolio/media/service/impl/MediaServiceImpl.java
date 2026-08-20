@@ -73,6 +73,7 @@ public class MediaServiceImpl implements MediaService {
 		enforceSizeLimit(type, content.length);
 
 		String normalizedAltText = normalizeAltText(altText);
+		requireAltTextForImages(type, normalizedAltText);
 		String storageName = UUID.randomUUID() + "." + type.extension();
 		String locator = storageService.store(storageName, content);
 
@@ -155,6 +156,18 @@ public class MediaServiceImpl implements MediaService {
 		if (actualBytes > limit) {
 			throw new ValidationException("File exceeds the %d MB limit for %s uploads"
 					.formatted(limit / (1024 * 1024), type.isImage() ? "image" : "document"));
+		}
+	}
+
+	/**
+	 * Images must describe themselves (Phase 10's accessibility rule, enforced here and by
+	 * {@code ck_media_image_has_alt_text}). Documents are exempt: a PDF's own title serves the
+	 * same purpose, and there is no {@code <img>} for a screen reader to stumble over.
+	 */
+	private void requireAltTextForImages(AllowedFileType type, String altText) {
+		if (type.isImage() && altText == null) {
+			throw new ValidationException(
+					"Alt text is required for images so screen readers can describe them");
 		}
 	}
 

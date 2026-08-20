@@ -1,5 +1,6 @@
 package com.portfolio.contact.service.impl;
 
+import com.portfolio.common.event.ContactMessageReceived;
 import com.portfolio.common.exception.RateLimitExceededException;
 import com.portfolio.common.exception.ResourceNotFoundException;
 import com.portfolio.common.ratelimit.RateLimiter;
@@ -14,6 +15,7 @@ import com.portfolio.contact.repository.ContactMessageRepository;
 import com.portfolio.contact.service.ContactService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,16 +42,19 @@ public class ContactServiceImpl implements ContactService {
 	private final ContactMessageMapper contactMessageMapper;
 	private final RateLimiter rateLimiter;
 	private final ContactProperties properties;
+	private final ApplicationEventPublisher events;
 
 	public ContactServiceImpl(
 			ContactMessageRepository contactMessageRepository,
 			ContactMessageMapper contactMessageMapper,
 			RateLimiter rateLimiter,
-			ContactProperties properties) {
+			ContactProperties properties,
+			ApplicationEventPublisher events) {
 		this.contactMessageRepository = contactMessageRepository;
 		this.contactMessageMapper = contactMessageMapper;
 		this.rateLimiter = rateLimiter;
 		this.properties = properties;
+		this.events = events;
 	}
 
 	@Override
@@ -78,6 +83,10 @@ public class ContactServiceImpl implements ContactService {
 				request.subject() == null || request.subject().isBlank() ? null : request.subject().trim(),
 				request.message()));
 		log.info("Contact message received: id={} status=NEW", saved.getId());
+		// In-process event (D-007): the notification listener must never be able to fail the
+		// submission the visitor is waiting on.
+		events.publishEvent(new ContactMessageReceived(
+				saved.getId(), saved.getName(), saved.getEmail(), saved.getSubject()));
 	}
 
 	@Override

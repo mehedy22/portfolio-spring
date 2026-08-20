@@ -25,8 +25,12 @@ public interface ProjectService {
 
 	PageResponse<ProjectSummaryResponse> listForAdmin(ContentStatus status, int page, int size, String sort);
 
-	/** Published projects only, in display order — no status filter is accepted here by design. */
-	List<ProjectSummaryResponse> listPublished();
+	/**
+	 * Published projects only, in display order — no status filter is accepted here by design.
+	 *
+	 * @param search optional free-text term matched against title, description and technologies
+	 */
+	List<ProjectSummaryResponse> listPublished(String search);
 
 	/** 404 (not 403) when the slug is unknown <em>or</em> not published — drafts stay invisible. */
 	ProjectResponse getPublishedBySlug(String slug);

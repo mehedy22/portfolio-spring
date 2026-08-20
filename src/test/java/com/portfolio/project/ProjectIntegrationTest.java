@@ -435,7 +435,7 @@ class ProjectIntegrationTest extends IntegrationTestBase {
 	private Long seedMedia(String fileName) {
 		Media media = mediaRepository.save(new Media(
 				"stored-" + fileName, fileName, "image/png", 100L, StorageBackend.LOCAL,
-				"2026/08/stored-" + fileName, 10, 10, null, null));
+				"2026/08/stored-" + fileName, 10, 10, "Seeded test image", null));
 		return media.getId();
 	}
 

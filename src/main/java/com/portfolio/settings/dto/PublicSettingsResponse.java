@@ -1,5 +1,6 @@
 package com.portfolio.settings.dto;
 
+import com.portfolio.media.dto.MediaResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
@@ -13,5 +14,9 @@ import java.util.Map;
  */
 @Schema(description = "Public-safe site configuration")
 public record PublicSettingsResponse(
-		Map<String, String> settings, Map<String, String> seo, List<SocialLinkResponse> socialLinks) {
+		Map<String, String> settings,
+		Map<String, String> seo,
+		List<SocialLinkResponse> socialLinks,
+		@Schema(description = "Images curated for the home page, in the order the admin listed them")
+				List<MediaResponse> featuredMedia) {
 }

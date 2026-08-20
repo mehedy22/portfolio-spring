@@ -31,6 +31,12 @@ public enum SettingKey {
 	 */
 	CONTACT_NOTIFICATION_EMAIL("contact.notification_email", Type.STRING, "", Access.PRIVATE, Group.GENERAL),
 
+	/**
+	 * The home page's featured gallery: media ids the admin picks, comma-separated. A setting
+	 * rather than a column so curating the home page needs no migration.
+	 */
+	HOME_FEATURED_MEDIA_IDS("home.featured_media_ids", Type.STRING, "", Access.PUBLIC, Group.GENERAL),
+
 	/** Nav toggles: the design hides Articles/Research until those modules ship. */
 	NAV_SHOW_ARTICLES("nav.show_articles", Type.BOOLEAN, "false", Access.PUBLIC, Group.GENERAL),
 	NAV_SHOW_RESEARCH("nav.show_research", Type.BOOLEAN, "false", Access.PUBLIC, Group.GENERAL),

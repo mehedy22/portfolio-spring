@@ -72,6 +72,13 @@ app:
       max-attempts: ${CONTACT_RATE_LIMIT_MAX_ATTEMPTS:5}
       window: ${CONTACT_RATE_LIMIT_WINDOW:1h}
 
+  analytics:
+    rate-limit:
+      # Generous by design: legitimate browsing generates many views
+      # (docs/08-security/application-security.md).
+      max-attempts: ${ANALYTICS_RATE_LIMIT_MAX_ATTEMPTS:60}
+      window: ${ANALYTICS_RATE_LIMIT_WINDOW:1m}
+
 springdoc:
   api-docs:
     path: /v3/api-docs

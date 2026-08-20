@@ -48,9 +48,13 @@ public class ProjectController {
 	// --------------------------------------------------------------- public
 
 	@GetMapping("/projects")
-	@Operation(summary = "List published projects", description = "Ordered by display order. Not paginated.")
-	public ApiResponse<List<ProjectSummaryResponse>> listPublished() {
-		return ApiResponse.of(projectService.listPublished());
+	@Operation(
+			summary = "List published projects",
+			description = "Ordered by display order. Not paginated. Optional ?search= matches title, "
+					+ "description and technology names (FR-18).")
+	public ApiResponse<List<ProjectSummaryResponse>> listPublished(
+			@RequestParam(required = false) String search) {
+		return ApiResponse.of(projectService.listPublished(search));
 	}
 
 	@GetMapping("/projects/{slug}")

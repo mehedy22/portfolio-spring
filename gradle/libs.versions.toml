@@ -5,6 +5,7 @@ mapstruct = "1.6.3"
 lombok = "1.18.46"
 springdoc = "2.9.0"
 jjwt = "0.12.6"
+htmlSanitizer = "20240325.1"
 
 [libraries]
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
@@ -14,6 +15,7 @@ springdoc-openapi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-u
 jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
 jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
 jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
+html-sanitizer = { module = "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer", version.ref = "htmlSanitizer" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }

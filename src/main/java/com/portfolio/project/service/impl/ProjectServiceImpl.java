@@ -150,10 +150,12 @@ public class ProjectServiceImpl implements ProjectService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<ProjectSummaryResponse> listPublished() {
-		return projectRepository.findByStatusOrderByDisplayOrderAscIdAsc(ContentStatus.PUBLISHED).stream()
-				.map(projectMapper::toSummary)
-				.toList();
+	public List<ProjectSummaryResponse> listPublished(String search) {
+		String term = search == null ? null : search.trim();
+		List<Project> found = term == null || term.isEmpty()
+				? projectRepository.findByStatusOrderByDisplayOrderAscIdAsc(ContentStatus.PUBLISHED)
+				: projectRepository.searchPublished(ContentStatus.PUBLISHED, term);
+		return found.stream().map(projectMapper::toSummary).toList();
 	}
 
 	@Override
