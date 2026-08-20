@@ -46,6 +46,14 @@ public class Education {
 	@Column(name = "field", length = 200)
 	private String field;
 
+	/**
+	 * GPA, CGPA, class or grade, as text. Grading systems are not comparable — "3.85 / 4.00",
+	 * "First Class" and "82%" are each the right answer somewhere — so this stores what the
+	 * institution actually awarded rather than forcing it into a number.
+	 */
+	@Column(name = "result", length = 50)
+	private String result;
+
 	@Column(name = "description", columnDefinition = "text")
 	private String description;
 
@@ -127,6 +135,14 @@ public class Education {
 
 	public void setField(String field) {
 		this.field = field;
+	}
+
+	public String getResult() {
+		return result;
+	}
+
+	public void setResult(String result) {
+		this.result = result;
 	}
 
 	public String getDescription() {

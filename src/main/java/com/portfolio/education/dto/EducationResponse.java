@@ -10,6 +10,7 @@ public record EducationResponse(
 		String institution,
 		String degree,
 		String field,
+		String result,
 		String description,
 		LocalDate startDate,
 		LocalDate endDate,

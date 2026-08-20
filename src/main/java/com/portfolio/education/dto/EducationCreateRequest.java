@@ -10,6 +10,7 @@ public record EducationCreateRequest(
 		@NotBlank @Size(max = 200) String institution,
 		@Size(max = 200) String degree,
 		@Size(max = 200) String field,
+		@Schema(description = "GPA, CGPA, class or grade, as awarded") @Size(max = 50) String result,
 		String description,
 		LocalDate startDate,
 		LocalDate endDate,

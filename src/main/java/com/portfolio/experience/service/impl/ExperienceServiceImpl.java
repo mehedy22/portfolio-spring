@@ -93,6 +93,7 @@ public class ExperienceServiceImpl implements ExperienceService {
 		checkDates(fields);
 
 		experience.setCompany(fields.company().trim());
+		experience.setCompanyUrl(blankToNull(fields.companyUrl()));
 		experience.setPosition(fields.position().trim());
 		experience.setEmploymentType(fields.employmentType());
 		experience.setDescription(fields.description());
@@ -130,8 +131,13 @@ public class ExperienceServiceImpl implements ExperienceService {
 	}
 
 	/** Create and update carry identical fields; this keeps the write path written once. */
+	private static String blankToNull(String value) {
+		return value == null || value.isBlank() ? null : value.trim();
+	}
+
 	private record Fields(
 			String company,
+			String companyUrl,
 			String position,
 			EmploymentType employmentType,
 			String description,
@@ -147,14 +153,14 @@ public class ExperienceServiceImpl implements ExperienceService {
 
 		static Fields of(ExperienceCreateRequest r) {
 			return new Fields(
-					r.company(), r.position(), r.employmentType(), r.description(), r.responsibilities(),
+					r.company(), r.companyUrl(), r.position(), r.employmentType(), r.description(), r.responsibilities(),
 					r.startDate(), r.endDate(), r.currentlyWorking(), r.companyLogoMediaId(),
 					r.displayOrder(), r.status(), r.aiVisible(), r.technologies());
 		}
 
 		static Fields of(ExperienceUpdateRequest r) {
 			return new Fields(
-					r.company(), r.position(), r.employmentType(), r.description(), r.responsibilities(),
+					r.company(), r.companyUrl(), r.position(), r.employmentType(), r.description(), r.responsibilities(),
 					r.startDate(), r.endDate(), r.currentlyWorking(), r.companyLogoMediaId(),
 					r.displayOrder(), r.status(), r.aiVisible(), r.technologies());
 		}

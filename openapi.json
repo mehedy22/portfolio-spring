@@ -2570,6 +2570,367 @@
                     }
                 }
             }
+        },
+        "/api/v1/research": {
+            "get": {
+                "tags": [
+                    "Research"
+                ],
+                "summary": "List published research",
+                "description": "Newest publication first. Optional ?tag= filter.",
+                "parameters": [
+                    {
+                        "name": "tag",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResearchListEnvelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/research": {
+            "get": {
+                "tags": [
+                    "Research"
+                ],
+                "summary": "List research",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "DRAFT",
+                                "PUBLISHED",
+                                "ARCHIVED"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResearchListEnvelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Research"
+                ],
+                "summary": "Create a research entry",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResearchCreateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResearchEnvelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/research/{id}": {
+            "get": {
+                "tags": [
+                    "Research"
+                ],
+                "summary": "Get a research entry",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResearchEnvelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Research"
+                ],
+                "summary": "Replace a research entry",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResearchUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResearchEnvelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Research"
+                ],
+                "summary": "Delete a research entry",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/api/v1/problem-solving": {
+            "get": {
+                "tags": [
+                    "Problem solving"
+                ],
+                "summary": "List published profiles",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemSolvingListEnvelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/problem-solving": {
+            "get": {
+                "tags": [
+                    "Problem solving"
+                ],
+                "summary": "List profiles",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "DRAFT",
+                                "PUBLISHED",
+                                "ARCHIVED"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemSolvingListEnvelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Problem solving"
+                ],
+                "summary": "Add a profile",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProblemSolvingProfileCreateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemSolvingEnvelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/problem-solving/{id}": {
+            "get": {
+                "tags": [
+                    "Problem solving"
+                ],
+                "summary": "Get a profile",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemSolvingEnvelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Problem solving"
+                ],
+                "summary": "Replace a profile",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProblemSolvingProfileUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemSolvingEnvelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Problem solving"
+                ],
+                "summary": "Delete a profile",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -3171,6 +3532,11 @@
                         "maxLength": 200,
                         "minLength": 0
                     },
+                    "companyUrl": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "minLength": 0
+                    },
                     "position": {
                         "type": "string",
                         "maxLength": 200,
@@ -3263,6 +3629,9 @@
                     "company": {
                         "type": "string"
                     },
+                    "companyUrl": {
+                        "type": "string"
+                    },
                     "position": {
                         "type": "string"
                     },
@@ -3345,6 +3714,11 @@
                         "maxLength": 200,
                         "minLength": 0
                     },
+                    "result": {
+                        "type": "string",
+                        "maxLength": 50,
+                        "minLength": 0
+                    },
                     "description": {
                         "type": "string"
                     },
@@ -3415,6 +3789,9 @@
                         "type": "string"
                     },
                     "field": {
+                        "type": "string"
+                    },
+                    "result": {
                         "type": "string"
                     },
                     "description": {
@@ -4200,6 +4577,12 @@
                         "maxLength": 200,
                         "minLength": 0
                     },
+                    "companyUrl": {
+                        "type": "string",
+                        "description": "The employer's site, linked from the company name",
+                        "maxLength": 500,
+                        "minLength": 0
+                    },
                     "position": {
                         "type": "string",
                         "maxLength": 200,
@@ -4282,6 +4665,12 @@
                     "field": {
                         "type": "string",
                         "maxLength": 200,
+                        "minLength": 0
+                    },
+                    "result": {
+                        "type": "string",
+                        "description": "GPA, CGPA, class or grade, as awarded",
+                        "maxLength": 50,
                         "minLength": 0
                     },
                     "description": {
@@ -4661,6 +5050,13 @@
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/SocialLinkResponse"
+                        }
+                    },
+                    "featuredMedia": {
+                        "type": "array",
+                        "description": "Images curated for the home page, in the order the admin listed them.",
+                        "items": {
+                            "$ref": "#/components/schemas/MediaResponse"
                         }
                     }
                 }
@@ -5372,6 +5768,420 @@
                         "items": {
                             "$ref": "#/components/schemas/AchievementResponse"
                         }
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ResearchResponse": {
+                "type": "object",
+                "description": "A research entry. Links out to a paper rather than hosting one (D-014).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "publicationVenue": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "publicationDate": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "externalUrl": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "pdf": {
+                        "$ref": "#/components/schemas/MediaResponse"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "DRAFT",
+                            "PUBLISHED",
+                            "ARCHIVED"
+                        ]
+                    },
+                    "displayOrder": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "aiVisible": {
+                        "type": "boolean"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "abstractText": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ResearchCreateRequest": {
+                "type": "object",
+                "required": [
+                    "title",
+                    "abstractText"
+                ],
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "maxLength": 250
+                    },
+                    "slug": {
+                        "type": "string",
+                        "maxLength": 270
+                    },
+                    "publicationVenue": {
+                        "type": "string",
+                        "maxLength": 250
+                    },
+                    "publicationDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "externalUrl": {
+                        "type": "string",
+                        "maxLength": 500
+                    },
+                    "pdfMediaId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "DRAFT",
+                            "PUBLISHED",
+                            "ARCHIVED"
+                        ]
+                    },
+                    "displayOrder": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "aiVisible": {
+                        "type": "boolean"
+                    },
+                    "abstractText": {
+                        "type": "string",
+                        "maxLength": 600
+                    }
+                }
+            },
+            "ResearchUpdateRequest": {
+                "type": "object",
+                "required": [
+                    "title",
+                    "abstractText"
+                ],
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "maxLength": 250
+                    },
+                    "slug": {
+                        "type": "string",
+                        "maxLength": 270
+                    },
+                    "publicationVenue": {
+                        "type": "string",
+                        "maxLength": 250
+                    },
+                    "publicationDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "externalUrl": {
+                        "type": "string",
+                        "maxLength": 500
+                    },
+                    "pdfMediaId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "DRAFT",
+                            "PUBLISHED",
+                            "ARCHIVED"
+                        ]
+                    },
+                    "displayOrder": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "aiVisible": {
+                        "type": "boolean"
+                    },
+                    "abstractText": {
+                        "type": "string",
+                        "maxLength": 600
+                    }
+                }
+            },
+            "ResearchListEnvelope": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResearchResponse"
+                        }
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ResearchEnvelope": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/ResearchResponse"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ProblemSolvingProfileResponse": {
+                "type": "object",
+                "description": "A competitive-programming or judge profile.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "platform": {
+                        "type": "string"
+                    },
+                    "handle": {
+                        "type": "string",
+                        "description": "Judge id / username"
+                    },
+                    "profileUrl": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "problemsSolved": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "rating": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "rankTitle": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "displayOrder": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "DRAFT",
+                            "PUBLISHED",
+                            "ARCHIVED"
+                        ]
+                    },
+                    "aiVisible": {
+                        "type": "boolean"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ProblemSolvingProfileCreateRequest": {
+                "type": "object",
+                "required": [
+                    "platform",
+                    "handle"
+                ],
+                "properties": {
+                    "platform": {
+                        "type": "string"
+                    },
+                    "handle": {
+                        "type": "string",
+                        "description": "Judge id / username"
+                    },
+                    "profileUrl": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "problemsSolved": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "rating": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "rankTitle": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "displayOrder": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "DRAFT",
+                            "PUBLISHED",
+                            "ARCHIVED"
+                        ]
+                    },
+                    "aiVisible": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "ProblemSolvingProfileUpdateRequest": {
+                "type": "object",
+                "required": [
+                    "platform",
+                    "handle"
+                ],
+                "properties": {
+                    "platform": {
+                        "type": "string"
+                    },
+                    "handle": {
+                        "type": "string",
+                        "description": "Judge id / username"
+                    },
+                    "profileUrl": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "problemsSolved": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "rating": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "rankTitle": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "displayOrder": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "DRAFT",
+                            "PUBLISHED",
+                            "ARCHIVED"
+                        ]
+                    },
+                    "aiVisible": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "ProblemSolvingListEnvelope": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProblemSolvingProfileResponse"
+                        }
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ProblemSolvingEnvelope": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/ProblemSolvingProfileResponse"
                     },
                     "message": {
                         "type": "string"

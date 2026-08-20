@@ -46,6 +46,10 @@ public class Experience {
 	@Column(name = "company", nullable = false, length = 200)
 	private String company;
 
+	/** The employer's own site. Nullable: not every employer has one worth linking. */
+	@Column(name = "company_url", length = 500)
+	private String companyUrl;
+
 	@Column(name = "position", nullable = false, length = 200)
 	private String position;
 
@@ -133,6 +137,14 @@ public class Experience {
 
 	public void setCompany(String company) {
 		this.company = company;
+	}
+
+	public String getCompanyUrl() {
+		return companyUrl;
+	}
+
+	public void setCompanyUrl(String companyUrl) {
+		this.companyUrl = companyUrl;
 	}
 
 	public String getPosition() {

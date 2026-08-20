@@ -92,6 +92,7 @@ public class EducationServiceImpl implements EducationService {
 		education.setInstitution(fields.institution().trim());
 		education.setDegree(fields.degree());
 		education.setField(fields.field());
+		education.setResult(blankToNull(fields.result()));
 		education.setDescription(fields.description());
 		education.setStartDate(fields.startDate());
 		education.setEndDate(fields.endDate());
@@ -110,10 +111,15 @@ public class EducationServiceImpl implements EducationService {
 				.orElseThrow(() -> new ResourceNotFoundException("Education " + id + " not found"));
 	}
 
+	private static String blankToNull(String value) {
+		return value == null || value.isBlank() ? null : value.trim();
+	}
+
 	private record Fields(
 			String institution,
 			String degree,
 			String field,
+			String result,
 			String description,
 			LocalDate startDate,
 			LocalDate endDate,
@@ -125,13 +131,13 @@ public class EducationServiceImpl implements EducationService {
 
 		static Fields of(EducationCreateRequest r) {
 			return new Fields(
-					r.institution(), r.degree(), r.field(), r.description(), r.startDate(), r.endDate(),
+					r.institution(), r.degree(), r.field(), r.result(), r.description(), r.startDate(), r.endDate(),
 					r.currentlyStudying(), r.logoMediaId(), r.displayOrder(), r.status(), r.aiVisible());
 		}
 
 		static Fields of(EducationUpdateRequest r) {
 			return new Fields(
-					r.institution(), r.degree(), r.field(), r.description(), r.startDate(), r.endDate(),
+					r.institution(), r.degree(), r.field(), r.result(), r.description(), r.startDate(), r.endDate(),
 					r.currentlyStudying(), r.logoMediaId(), r.displayOrder(), r.status(), r.aiVisible());
 		}
 	}

@@ -10,6 +10,7 @@ import java.util.List;
 public record ExperienceResponse(
 		Long id,
 		String company,
+		String companyUrl,
 		String position,
 		EmploymentType employmentType,
 		String description,

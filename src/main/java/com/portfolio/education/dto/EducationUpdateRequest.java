@@ -9,6 +9,7 @@ public record EducationUpdateRequest(
 		@NotBlank @Size(max = 200) String institution,
 		@Size(max = 200) String degree,
 		@Size(max = 200) String field,
+		@Size(max = 50) String result,
 		String description,
 		LocalDate startDate,
 		LocalDate endDate,

@@ -15,6 +15,7 @@ import java.util.List;
  */
 public record ExperienceCreateRequest(
 		@NotBlank @Size(max = 200) String company,
+		@Schema(description = "The employer's site, linked from the company name") @Size(max = 500) String companyUrl,
 		@NotBlank @Size(max = 200) String position,
 		EmploymentType employmentType,
 		String description,

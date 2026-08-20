@@ -11,6 +11,7 @@ import java.util.List;
 /** Whole-row replace; the technologies sent become the complete set. */
 public record ExperienceUpdateRequest(
 		@NotBlank @Size(max = 200) String company,
+		@Size(max = 500) String companyUrl,
 		@NotBlank @Size(max = 200) String position,
 		EmploymentType employmentType,
 		String description,
